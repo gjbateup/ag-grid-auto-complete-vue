@@ -1,30 +1,33 @@
-import Vue from "vue";
-
 import VAutoComplete from "./AutoComplete.vue";
+import { createApp,h } from 'vue'
+
+
 
 export default function getAutoComplete() {
   function AutoComplete() {}
 
   AutoComplete.prototype.init = function(params) {
-    this.el = new Vue({
-      mixins: [
-        Vue.mixin({
+    const app = Vue.createApp({})
+
+    app.mixin({
           data() {
             return {
               gridComponent: AutoComplete.prototype,
               params,
             };
           },
-        }),
-      ],
+        })
 
-      render(h) {
-        return h(VAutoComplete);
-      },
-    }).$mount().$el;
-  };
+
+    app.mount('#app').$el
+
+  }
+
+ 
+
   AutoComplete.prototype.getGui = function() {
     return this.el;
   };
   return AutoComplete;
 }
+
