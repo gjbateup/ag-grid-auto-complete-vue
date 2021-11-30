@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { AgGridVue } from "ag-grid-vue";
+import { AgGridVue } from 'ag-grid-vue3';
 import axios from "axios";
 export default {
   components: {
@@ -42,6 +42,8 @@ export default {
       cellValue: "",
       filteredRowData: null,
       inputValue: "",
+      rowDataFunction: null,
+      useDataFunction: false,
       useApi: false,
       apiEndpoint: null,
       queryChars: 2,
@@ -55,6 +57,21 @@ export default {
     };
   },
   methods: {
+
+     getValue() {
+      if (!this.returnObject) return this.selectedObject[this.propertyName];
+      return this.selectedObject;
+      },
+
+    isPopup() {
+      return true;
+    },
+
+    isCancelAfterEnd() {
+      return this.isCanceled;
+    },
+
+
     onGridReady(event) {
       this.gridApi = event.api;
       this.gridApi.sizeColumnsToFit();
@@ -121,7 +138,8 @@ export default {
           type: "startsWith",
           filter: this.inputValue,
         });
-        this.columnFilter.onFilterChanged();
+    
+        this.gridApi.onFilterChanged();
 
         if (this.gridApi.getDisplayedRowAtIndex(0)) {
           this.gridApi.getDisplayedRowAtIndex(0).setSelected(true);
@@ -164,9 +182,12 @@ export default {
     },
   },
   beforeMount() {
-    if (!this.params.rowData) {
+    if (this.params.apiEndpoint) {
       this.apiEndpoint = this.params.apiEndpoint;
       this.useApi = true;
+    } else if (this.params.rowDataFunction) {
+      this.rowDataFunction = this.params.rowDataFunction;
+      this.useDataFunction = true;
     } else {
       this.rowData = this.params.rowData;
     }
@@ -213,6 +234,10 @@ export default {
         });
       });
     }
+
+    if (this.useDataFunction == true) {
+      console.log(this.rowDataFunction(this.params))
+    }
   },
   mounted() {
     this.input = this.$refs.input;
@@ -223,19 +248,8 @@ export default {
         : this.input.focus();
       if (this.inputValue && !this.useApi) this.updateFilter();
     });
-
-    this.gridComponent.getValue = () => {
-      if (!this.returnObject) return this.selectedObject[this.propertyName];
-      return this.selectedObject;
-    };
-
-    this.gridComponent.isPopup = () => {
-      return true;
-    };
-    this.gridComponent.isCancelAfterEnd = () => {
-      return this.isCanceled;
-    };
-
+ 
+ 
     this.$refs.autoCompleteArea.addEventListener("keydown", this.onKeydown);
   },
   watch: {
@@ -243,6 +257,7 @@ export default {
       this.processDataInput(val);
     },
   },
+
 };
 </script>
 
