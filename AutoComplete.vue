@@ -235,8 +235,8 @@ export default {
       });
     }
 
-    if (this.useDataFunction == true) {
-      console.log(this.rowDataFunction(this.params))
+     if (this.useDataFunction == true) {
+      this.rowData = this.rowDataFunction(this.params)
     }
   },
   mounted() {
